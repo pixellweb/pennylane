@@ -1,0 +1,30 @@
+{
+    "name": "pixellweb/pennylane",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "B1nj",
+            "email": "postmaster@b1nj.fr"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "spatie/laravel-data": "^3.12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PixellWeb\\Pennylane\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+              "PixellWeb\\Pennylane\\PennylaneServiceProvider",
+              "PixellWeb\\Pennylane\\EventServiceProvider"
+            ]
+        }
+    },
+    "require-dev": {
+
+    }
+}
