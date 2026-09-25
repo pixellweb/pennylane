@@ -33,7 +33,7 @@ class InvoiceData extends Data
     }
 
 
-    public function toIpsum(FactureType $factureType = FactureType::ADDITIONNEL): ?array
+    public function toIpsum(FactureType $factureType = FactureType::ADDITIONNELLE): ?array
     {
         // Ne pas prendre en compte les factures sans réfèrence de commande renseignée
         if (!Reservation::where('reference', $this->purchase_order_reference)->exists()) {

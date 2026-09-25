@@ -38,8 +38,7 @@ class IpsumInvoiceAction
 
         $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($reservation, $dataCollection));
 
-        // TODO
-        $factureType = $reservation->prestations->contains('custom_fields.', 'TODO') ? FactureType::LOCATION : FactureType::ADDITIONNEL;
+        $factureType = $reservation->factureLocation ? FactureType::ADDITIONNELLE : FactureType::LOCATION;
 
         return Facture::create($invoice->toIpsum($factureType));
     }
