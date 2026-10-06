@@ -3,6 +3,7 @@
 namespace PixellWeb\Pennylane\app\Data\Requests;
 
 use Carbon\Carbon;
+use Ipsum\Reservation\app\Models\Reservation\Facture;
 use Ipsum\Reservation\app\Models\Reservation\Reservation;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -23,25 +24,32 @@ class CreateInvoiceData extends Data
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public Carbon $deadline,
         public int $customer_id,
+        public Optional|DiscountData $discount,
+        public string $purchase_order_reference,
+        public ?bool $draft,
         #[DataCollectionOf(InvoiceLinesData::class)]
         public DataCollection $invoice_lines,
-        public string $purchase_order_reference,
     ) {
     }
 
 
-    public static function fromIpsum(Reservation $reservation, array $dataCollection): self
+    public static function fromIpsum(Facture $facture, bool $brouillon): self
     {
-        return new self(
-            now(),
-            now()->addMonth(), // TODO
-            $reservation->client->custom_fields->pennylane_id ?? $reservation->custom_fields->pennylane_customer_id,
-            new DataCollection(InvoiceLinesData::class, $dataCollection),
-            $reservation->reference
 
+        $dataCollection = [];
+        foreach ($facture->produits as $produit) {
+            $dataCollection[] = InvoiceLinesData::fromIpsum($produit)->toArray();
+        }
 
-            // TODO promo
-        );
+        return self::validateAndCreate(array_filter([
+            'date' => now(),
+            'deadline' => $facture->echeance_at,
+            'customer_id' => $facture->client->reference_externe,
+            //'discount' => $facture->remise ? DiscountData::fromIpsum($facture) : null, // Remise au niveau des produits car cela pose problème avec le calcul de la tva
+            'purchase_order_reference' => $facture->reservation->reference,
+            'draft' => $brouillon,
+            'invoice_lines' => $dataCollection
+        ]));
     }
 
     

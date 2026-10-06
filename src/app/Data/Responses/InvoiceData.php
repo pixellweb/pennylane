@@ -3,6 +3,7 @@
 namespace PixellWeb\Pennylane\app\Data\Responses;
 
 use Carbon\Carbon;
+use Ipsum\Reservation\app\Enum\FactureEtat;
 use Ipsum\Reservation\app\Enum\FactureType;
 use Ipsum\Reservation\app\Models\Reservation\Reservation;
 use Spatie\LaravelData\Attributes\WithCast;
@@ -16,12 +17,13 @@ class InvoiceData extends Data
 {
     public function __construct(
         public int $id,
-        public string $invoice_number,
+        public ?string $invoice_number,
         public string $amount,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         public Carbon $date,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         public Carbon $deadline,
+        public bool $draft,
         public string $public_file_url,
         public string $purchase_order_reference,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d\TH:i:s.uP')]
@@ -33,19 +35,15 @@ class InvoiceData extends Data
     }
 
 
-    public function toIpsum(FactureType $factureType = FactureType::ADDITIONNELLE): ?array
+    public function toIpsum(): ?array
     {
-        // Ne pas prendre en compte les factures sans réfèrence de commande renseignée
-        if (!Reservation::where('reference', $this->purchase_order_reference)->exists()) {
-            return null;
-        }
-
+        // Actuelement seulement la modification prise en compte
         return [
-            'numero' => $this->invoice_number,
-            'type' => $factureType,
+            'numero' => $this->invoice_number !== '' ? $this->invoice_number : null,
+            'etat' => $this->draft ? FactureEtat::BROUILLON : FactureEtat::VALIDEE,
             'provider' => 'pennylane',
             'provider_reference' => $this->id,
-            'reservation_id' => $this->purchase_order_reference,
+            'emmission_at' => $this->date
         ];
         
     }

@@ -19,7 +19,7 @@ class BillingAdressData extends Data
     }
 
 
-    public static function fromIpsum(Reservation $data): array
+    public static function fromIpsum(Client|Reservation $data): array
     {
         return [
             'address' => $data->adresse,

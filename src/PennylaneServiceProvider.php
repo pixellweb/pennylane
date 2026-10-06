@@ -2,16 +2,22 @@
 
 namespace PixellWeb\Pennylane;
 
-use Illuminate\Support\Facades\Route;
+
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Ipsum\Reservation\app\Contracts\FactureContract;
+use PixellWeb\Pennylane\app\Console\Commands\Produit;
 use PixellWeb\Pennylane\app\Console\Commands\Test;
+use PixellWeb\Pennylane\app\FacturePennylaneProvider;
+
 
 
 class PennylaneServiceProvider extends ServiceProvider
 {
 
     protected $commands = [
-        Test::class
+        Test::class,
+        Produit::class,
     ];
 
 
@@ -30,11 +36,14 @@ class PennylaneServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+        $this->loadViewsFrom(__DIR__.'/ressources/views', 'Pennylane');
+
         $this->addCustomConfigurationValues();
 
-        Route::middleware(['web'])
+        /*Route::middleware(['web'])
             ->prefix(config('ipsum.admin.route_prefix'))
-            ->group(__DIR__.'/routes/admin.php');
+            ->group(__DIR__.'/routes/admin.php');*/
     }
 
     public function addCustomConfigurationValues()
@@ -64,5 +73,9 @@ class PennylaneServiceProvider extends ServiceProvider
 
         // register the artisan commands
         $this->commands($this->commands);
+
+        if (config('ipsum.reservation.facture_provider') === 'pennylane') {
+            $this->app->bind(FactureContract::class, FacturePennylaneProvider::class);
+        }
     }
 }

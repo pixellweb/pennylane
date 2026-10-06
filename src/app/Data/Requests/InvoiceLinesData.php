@@ -3,7 +3,8 @@
 namespace PixellWeb\Pennylane\app\Data\Requests;
 
 
-use Ipsum\Reservation\app\Models\Reservation\Casts\Prestation;
+use Ipsum\Reservation\app\Models\Prestation\Prestation;
+use Ipsum\Reservation\app\Models\Prestation\Type;
 use Ipsum\Reservation\app\Models\Reservation\Reservation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
@@ -18,19 +19,23 @@ class InvoiceLinesData extends Data
         public string $raw_currency_unit_price,
         public string $vat_rate,
         public int $quantity,
+        public Optional|DiscountData $discount,
     ) {
     }
 
 
-    public static function fromIpsum(Reservation $reservation, Prestation $prestation): self
+    public static function fromIpsum(Prestation $prestation): self
     {
-        return new self(
-            '97020051456', // TODO
-            Optional::create(),
-            'Catégorie '.$reservation->categorie_nom . ' du '.$reservation->debut_at->format('d/m/Y').' au '.$reservation->fin_at->format('d/m/Y'),
-            $reservation->montant_base, // TODO calculer en ht
-            'FR_85', // TODO tva prévoir un custom field dans prestation
-            1,
-        );
+        $prix_unitaire = ($prestation->pivot->montant / (1 + ($prestation->taxe->taux / 100)) + $prestation->pivot->remise) / $prestation->pivot->quantite;
+
+        return self::validateAndCreate(array_filter([
+            'product_id' => $prestation->reference_externe,
+            'label' => null,
+            'description' => $prestation->pivot->description ?? null,
+            'raw_currency_unit_price' => (string) $prix_unitaire,
+            'vat_rate' => $prestation->taxe->taux ? 'FR_'.round($prestation->taxe->taux * 10) : 'exempt', // TODO code dupliqué
+            'quantity' => $prestation->pivot->quantite,
+            'discount' => $prestation->pivot->remise ? DiscountData::fromIpsum($prestation->pivot->remise) : null,
+        ]));
     }
 }

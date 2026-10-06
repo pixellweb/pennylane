@@ -3,13 +3,12 @@
 namespace PixellWeb\Pennylane\app\Actions;
 
 
-use Ipsum\Reservation\app\Enum\FactureType;
-use Ipsum\Reservation\app\Models\Prestation\Prestation;
+use Illuminate\Support\Facades\Cache;
 use Ipsum\Reservation\app\Models\Reservation\Facture;
-use Ipsum\Reservation\app\Models\Reservation\Reservation;
 use PixellWeb\Pennylane\app\Data\Requests\CreateInvoiceData;
-use PixellWeb\Pennylane\app\Data\Requests\InvoiceLinesData;
+use PixellWeb\Pennylane\app\Data\Requests\UpdateInvoiceData;
 use PixellWeb\Pennylane\app\Data\Responses\InvoiceData;
+use PixellWeb\Pennylane\app\PennylaneException;
 use PixellWeb\Pennylane\app\Ressources\Invoice;
 
 class IpsumInvoiceAction
@@ -18,7 +17,7 @@ class IpsumInvoiceAction
         private Invoice $invoice
     ) {}
 
-    public function syncFromProvider(InvoiceData $invoiceData): Facture
+    /*public function syncFromProvider(InvoiceData $invoiceData): Facture
     {
         return Facture::updateOrCreate([
             'provider' => 'pennylane',
@@ -26,25 +25,40 @@ class IpsumInvoiceAction
         ],
             $invoiceData->toIpsum()
         );
-    }
+    }*/
 
-    public function syncToProvider(Reservation $reservation): Facture
+    public function syncToProvider(Facture $facture, bool $brouillon): InvoiceData
     {
+        if ($facture->provider_reference) {
 
-        $dataCollection = [];
-        foreach ($reservation->prestations as $prestation) {
-            $dataCollection[] = InvoiceLinesData::fromIpsum($reservation, $prestation);
+            if ($facture->provider !== 'pennylane') {
+                throw new PennylaneException('Provider reference not allowed');
+            }
+
+
+            return $this->invoice->update(UpdateInvoiceData::fromIpsum($facture, $this->invoice), $facture->provider_reference);
         }
 
-        $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($reservation, $dataCollection));
+        $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
 
-        $factureType = $reservation->factureLocation ? FactureType::ADDITIONNELLE : FactureType::LOCATION;
+        $facture->update($invoice->toIpsum());
 
-        return Facture::create($invoice->toIpsum($factureType));
+        return $invoice;
+    }
+
+    public function finalize(Facture $facture): void
+    {
+        $invoiceData = $this->invoice->finalize($facture->provider_reference);
+        $facture->update($invoiceData->toIpsum());
+    }
+
+    public function delete(Facture $facture): void
+    {
+        $this->invoice->delete($facture->provider_reference);
     }
 
 
-    public function sendToCustomer(Facture $facture, bool|string|array $emails = null)
+    public function sendToCustomer(Facture $facture, bool|string|array $emails = null): void
     {
         if ($emails) {
             if ($emails === true) {
@@ -68,11 +82,20 @@ class IpsumInvoiceAction
         }
     }
 
-    public function getUrlPdf(Facture $facture): string
+    public function getUrlPdf(Facture $facture, $cache = true): string
     {
-        return $this->invoice->get($facture->provider_reference)->public_file_url;
-    }
+        if (!$facture->provider_reference) {
+            throw new PennylaneException('Réfèrence Pennylane non renseignée.');
+        }
 
+        if (!$cache) {
+            return $this->invoice->get($facture->provider_reference)->public_file_url;
+        }
+
+        return Cache::remember('facture-'.$facture->numero, 5 * 60, function () use ($facture) {
+            return $this->invoice->get($facture->provider_reference)->public_file_url;
+        });
+    }
 }
 
 

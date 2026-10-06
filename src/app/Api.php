@@ -124,4 +124,10 @@ class Api
         return $this->request('PATCH', $ressource_path, $params, $query);
     }
 
+
+    public function delete(string $ressource_path, array $params = [], $query = null): array
+    {
+        return $this->request('DELETE', $ressource_path, $params, $query);
+    }
+
 }
