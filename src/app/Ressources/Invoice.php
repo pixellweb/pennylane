@@ -67,6 +67,11 @@ class Invoice extends Ressource
         return InvoiceData::from($invoice);
     }
 
+    public function markAsPaid(int $id): void
+    {
+        $this->crawler->put('customer_invoices/'.$id.'/mark_as_paid');
+    }
+
 
     public function listLines(int $id): array
     {

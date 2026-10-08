@@ -27,7 +27,7 @@ class IpsumInvoiceAction
         );
     }*/
 
-    public function syncToProvider(Facture $facture, bool $brouillon): InvoiceData
+    public function syncToProvider(Facture $facture, bool $brouillon): ?InvoiceData
     {
         if ($facture->provider_reference) {
 
@@ -35,21 +35,31 @@ class IpsumInvoiceAction
                 throw new PennylaneException('Provider reference not allowed');
             }
 
+            if (!$facture->numero) {
+                $invoice = $this->invoice->update(UpdateInvoiceData::fromIpsum($facture, $this->invoice), $facture->provider_reference);
+            }
 
-            return $this->invoice->update(UpdateInvoiceData::fromIpsum($facture, $this->invoice), $facture->provider_reference);
+        } else {
+            $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
+
+            $facture->update($invoice->toIpsum());
         }
 
-        $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
+        if ($facture->numero and $facture->is_payee) {
+            $this->invoice->markAsPaid($facture->provider_reference);
+        } // Pas de posibilité de marquer une facture comme impayé via l'api
 
-        $facture->update($invoice->toIpsum());
-
-        return $invoice;
+        return $invoice ?? null;
     }
 
     public function finalize(Facture $facture): void
     {
         $invoiceData = $this->invoice->finalize($facture->provider_reference);
         $facture->update($invoiceData->toIpsum());
+
+        if ($facture->numero and $facture->is_payee) {
+            $this->invoice->markAsPaid($facture->provider_reference);
+        } // Pas de posibilité de marquer une facture comme impayé via l'api
     }
 
     public function delete(Facture $facture): void

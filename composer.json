@@ -19,7 +19,8 @@
     "extra": {
         "laravel": {
             "providers": [
-              "PixellWeb\\Pennylane\\PennylaneServiceProvider"
+              "PixellWeb\\Pennylane\\PennylaneServiceProvider",
+              "PixellWeb\\Pennylane\\EventServiceProvider"
             ]
         }
     },

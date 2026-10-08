@@ -28,7 +28,7 @@ class InvoiceLinesData extends Data
 
         return self::validateAndCreate(array_filter([
             'product_id' => $prestation->reference_externe,
-            'label' => null,
+            'label' => $prestation->nom,
             'description' => $prestation->pivot->description ?? null,
             'raw_currency_unit_price' => (string) $prix_unitaire,
             'vat_rate' => $prestation->taxe->taux ? 'FR_'.round($prestation->taxe->taux * 10) : 'exempt',
