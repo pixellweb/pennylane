@@ -3,8 +3,7 @@
 namespace PixellWeb\Pennylane\app\Actions;
 
 
-use Ipsum\Reservation\app\Models\Client;
-use Ipsum\Reservation\app\Models\Reservation\Reservation;
+use Ipsum\Reservation\app\Models\Reservation\Facture;
 use PixellWeb\Pennylane\app\Data\Requests\SaveCompagnyCustomerData;
 use PixellWeb\Pennylane\app\Data\Requests\SaveIndividualCustomerData;
 use PixellWeb\Pennylane\app\Data\Responses\CustomerData;
@@ -31,35 +30,35 @@ class IpsumCustomerAction
         return $client;
     }*/
 
-    public function syncToProvider(Reservation $reservation): CustomerData
+    public function syncToProvider(Facture $facture): CustomerData
     {
-        if ($reservation->entreprise) {
-            $saveCustomerData = SaveCompagnyCustomerData::fromIpsum($reservation);
+        if ($facture->client->is_entreprise) {
+            $saveCustomerData = SaveCompagnyCustomerData::fromIpsum($facture->client);
 
-            $is_create = !$reservation->entreprise->reference_externe;
+            $is_create = !$facture->client->reference_externe;
 
             if ($is_create) {
                 $customer = $this->customer->createCompany($saveCustomerData);
 
-                $reservation->entreprise->reference_externe = $customer->id;
-                $reservation->entreprise->save();
+                $facture->client->reference_externe = $customer->id;
+                $facture->client->save();
 
             } else {
-                $customer = $this->customer->updateCompany($saveCustomerData, $reservation->entreprise->reference_externe);
+                $customer = $this->customer->updateCompany($saveCustomerData, $facture->client->reference_externe);
             }
         } else {
-            $saveCustomerData = SaveIndividualCustomerData::fromIpsum($reservation);
+            $saveCustomerData = SaveIndividualCustomerData::fromIpsum($facture);
 
-            $is_create = !$reservation->client->reference_externe;
+            $is_create = !$facture->client->reference_externe;
 
             if ($is_create) {
                 $customer = $this->customer->createIndividual($saveCustomerData);
 
-                $reservation->client->reference_externe = $customer->id;
-                $reservation->client->save();
+                $facture->client->reference_externe = $customer->id;
+                $facture->client->save();
 
             } else {
-                $customer = $this->customer->updateIndividual($saveCustomerData, $reservation->client->reference_externe);
+                $customer = $this->customer->updateIndividual($saveCustomerData, $facture->client->reference_externe);
             }
         }
 

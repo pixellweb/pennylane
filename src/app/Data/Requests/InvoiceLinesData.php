@@ -4,8 +4,6 @@ namespace PixellWeb\Pennylane\app\Data\Requests;
 
 
 use Ipsum\Reservation\app\Models\Prestation\Prestation;
-use Ipsum\Reservation\app\Models\Prestation\Type;
-use Ipsum\Reservation\app\Models\Reservation\Reservation;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Optional;
 
@@ -33,7 +31,7 @@ class InvoiceLinesData extends Data
             'label' => null,
             'description' => $prestation->pivot->description ?? null,
             'raw_currency_unit_price' => (string) $prix_unitaire,
-            'vat_rate' => $prestation->taxe->taux ? 'FR_'.round($prestation->taxe->taux * 10) : 'exempt', // TODO code dupliqué
+            'vat_rate' => $prestation->taxe->taux ? 'FR_'.round($prestation->taxe->taux * 10) : 'exempt',
             'quantity' => $prestation->pivot->quantite,
             'discount' => $prestation->pivot->remise ? DiscountData::fromIpsum($prestation->pivot->remise) : null,
         ]));

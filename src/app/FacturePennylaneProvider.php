@@ -17,9 +17,9 @@ class FacturePennylaneProvider implements FactureContract
         private IpsumCustomerAction $customerAction,
     ) {}
 
-    public function syncToProvider(Facture $facture, bool $brouillon = false): void
+    public function syncToProvider(Facture $facture, bool $brouillon = true): void
     {
-        $this->customerAction->syncToProvider($facture->reservation);
+        $this->customerAction->syncToProvider($facture);
         $this->invoiceAction->syncToProvider($facture, $brouillon);
     }
 

@@ -43,7 +43,7 @@ class InvoiceData extends Data
             'etat' => $this->draft ? FactureEtat::BROUILLON : FactureEtat::VALIDEE,
             'provider' => 'pennylane',
             'provider_reference' => $this->id,
-            'emmission_at' => $this->date
+            'emission_at' => $this->date
         ];
         
     }

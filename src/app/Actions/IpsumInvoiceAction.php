@@ -60,7 +60,11 @@ class IpsumInvoiceAction
 
     public function sendToCustomer(Facture $facture, bool|string|array $emails = null): void
     {
-        if ($emails) {
+        if (app()->isLocal() or app()->hasDebugModeEnabled()) {
+            return;
+        }
+
+        if (!$facture->client->is_entreprise or $emails) {
             if ($emails === true) {
                 $emails = [];
             } else {
@@ -69,17 +73,18 @@ class IpsumInvoiceAction
 
             $this->invoice->sendByEmail($facture->provider_reference, $emails);
 
-            return;
-        }
-
-        // Ne faire que sur les entreprises ?
-        try {
-            $this->invoice->sendToPA($facture->provider_reference);
-        } catch (\Exception $exception) {
-            if ($exception->getCode() === 422) {
-                $this->sendToCustomer($facture, true);
+        } else {
+            try {
+                $this->invoice->sendToPA($facture->provider_reference);
+            } catch (\Exception $exception) {
+                if ($exception->getCode() === 422) {
+                    $this->sendToCustomer($facture, true);
+                }
             }
         }
+
+        $facture->send_at = now();
+        $facture->save();
     }
 
     public function getUrlPdf(Facture $facture, $cache = true): string

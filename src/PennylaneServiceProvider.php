@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Ipsum\Reservation\app\Contracts\FactureContract;
 use PixellWeb\Pennylane\app\Console\Commands\Produit;
+use PixellWeb\Pennylane\app\Console\Commands\SendToCustomer;
 use PixellWeb\Pennylane\app\Console\Commands\Test;
 use PixellWeb\Pennylane\app\FacturePennylaneProvider;
 
@@ -18,6 +19,7 @@ class PennylaneServiceProvider extends ServiceProvider
     protected $commands = [
         Test::class,
         Produit::class,
+        SendToCustomer::class,
     ];
 
 

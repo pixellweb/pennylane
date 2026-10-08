@@ -24,16 +24,16 @@ class SaveCompagnyCustomerData extends Data
     }
 
 
-    public static function fromIpsum(Reservation $reservation): self
+    public static function fromIpsum(Client $client): self
     {
         return self::validateAndCreate([
-            'name' => $reservation->entreprise->nom,
-            'vat_number' => $reservation->entreprise->vat_numero,
-            'reg_no' => $reservation->entreprise->siren,
-            'phone' => $reservation->entreprise->telephone,
-            'billing_address' => BillingAdressData::fromIpsum($reservation->entreprise),
-            'emails' => [$reservation->entreprise->email],
-            'external_reference' => $reservation->entreprise->code
+            'name' => $client->nom,
+            'vat_number' => $client->vat_numero,
+            'reg_no' => $client->siren,
+            'phone' => $client->telephone,
+            'billing_address' => BillingAdressData::fromIpsum($client),
+            'emails' => [$client->email],
+            'external_reference' => $client->code
         ]);
     }
 

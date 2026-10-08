@@ -4,8 +4,6 @@ namespace PixellWeb\Pennylane\app\Data\Requests;
 
 use Ipsum\Reservation\app\Models\Prestation\Prestation;
 use PixellWeb\Pennylane\app\Enums\Substance;
-use Spatie\LaravelData\Attributes\WithCast;
-use Spatie\LaravelData\Casts\EnumCast;
 use Spatie\LaravelData\Data;
 
 
