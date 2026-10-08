@@ -24,6 +24,10 @@ class UpdatePrestation
 
     public function handle(PrestationUpdatedEvent|PrestationCreatedEvent $event)
     {
+        if (config('ipsum.reservation.facture_provider') !== 'pennylane') {
+            return;
+        }
+
         try {
             $this->ipsumProductAction->syncToProvider($event->prestation);
         } catch (\Exception $e) {
