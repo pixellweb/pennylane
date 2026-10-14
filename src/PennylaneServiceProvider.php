@@ -52,9 +52,9 @@ class PennylaneServiceProvider extends ServiceProvider
     {
         // add filesystems.disks for the log viewer
         config([
-            'logging.channels.'.config('pennylane.logging_channel') => [
+            'logging.channels.pennylane' => [
                 'driver' => 'single',
-                'path' => storage_path('logs/'.config('pennylane.logging_channel').'.log'),
+                'path' => storage_path('logs/pennylane.log'),
                 'level' => 'debug',
             ]
         ]);

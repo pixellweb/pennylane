@@ -28,9 +28,9 @@ class FacturePennylaneProvider implements FactureContract
         $this->invoiceAction->finalize($facture);
     }
 
-    public function sendToCustomer(Facture $facture, bool|array|string $emails = null): void
+    public function sendToCustomer(Facture $facture, bool|string $email = null): void
     {
-        $this->invoiceAction->sendToCustomer($facture, $emails);
+        $this->invoiceAction->sendToCustomer($facture, $email);
     }
 
     public function delete(Facture $facture): void
