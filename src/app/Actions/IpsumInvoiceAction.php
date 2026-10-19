@@ -27,7 +27,7 @@ class IpsumInvoiceAction
         );
     }*/
 
-    public function syncToProvider(Facture $facture, bool $brouillon): ?InvoiceData
+    public function syncToProvider(Facture $facture, bool $brouillon): InvoiceData
     {
         if ($facture->provider_reference) {
 
@@ -36,30 +36,34 @@ class IpsumInvoiceAction
             }
 
             if (!$facture->numero) {
-                $invoice = $this->invoice->update(UpdateInvoiceData::fromIpsum($facture, $this->invoice), $facture->provider_reference);
+                $this->invoice->update(UpdateInvoiceData::fromIpsum($facture, $this->invoice), $facture->provider_reference);
             }
 
         } else {
-            $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
-
-            $facture->update($invoice->toIpsum());
+            $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
         }
 
         if ($facture->numero and $facture->is_payee) {
             $this->invoice->markAsPaid($facture->provider_reference);
         } // Pas de posibilité de marquer une facture comme impayé via l'api
 
-        return $invoice ?? null;
+
+        $invoice = $this->invoice->get($facture->provider_reference);
+        $facture->update($invoice->toIpsum());
+
+        return $invoice;
     }
 
     public function finalize(Facture $facture): void
     {
-        $invoiceData = $this->invoice->finalize($facture->provider_reference);
-        $facture->update($invoiceData->toIpsum());
+        $this->invoice->finalize($facture->provider_reference);
 
         if ($facture->numero and $facture->is_payee) {
             $this->invoice->markAsPaid($facture->provider_reference);
         } // Pas de posibilité de marquer une facture comme impayé via l'api
+
+        $invoice = $this->invoice->get($facture->provider_reference);
+        $facture->update($invoice->toIpsum());
     }
 
     public function delete(Facture $facture): void
