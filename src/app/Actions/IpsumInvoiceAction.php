@@ -40,15 +40,15 @@ class IpsumInvoiceAction
             }
 
         } else {
-            $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
+            $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
         }
 
         if ($facture->numero and $facture->is_payee) {
-            $this->invoice->markAsPaid($facture->provider_reference);
+            $this->invoice->markAsPaid($facture->provider_reference ?? $invoice->id);
         } // Pas de posibilité de marquer une facture comme impayé via l'api
 
 
-        $invoice = $this->invoice->get($facture->provider_reference);
+        $invoice = $this->invoice->get($facture->provider_reference ?? $invoice->id);
         $facture->update($invoice->toIpsum());
 
         return $invoice;
