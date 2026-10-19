@@ -51,7 +51,7 @@ class SendToCustomer extends Command
     {
         $factures = Facture::whereNull('send_at')
             ->whereNotNull('numero')
-            ->where('etat', FactureEtat::VALIDEE)
+            ->where('etat', '!=', FactureEtat::BROUILLON)
             ->where('emission_at', '>', now()->subDays(10)) // Permet de ne pas envoyer de trop vielles facture
             ->get();
 

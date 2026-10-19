@@ -23,6 +23,7 @@ class InvoiceData extends Data
         public Carbon $date,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         public Carbon $deadline,
+        public bool $paid,
         public bool $draft,
         public string $public_file_url,
         public string $purchase_order_reference,
@@ -40,7 +41,7 @@ class InvoiceData extends Data
         // Actuelement seulement la modification prise en compte
         return [
             'numero' => $this->invoice_number !== '' ? $this->invoice_number : null,
-            'etat' => $this->draft ? FactureEtat::BROUILLON : FactureEtat::VALIDEE,
+            'etat' => $this->draft ? FactureEtat::BROUILLON : ($this->paid ? FactureEtat::PAYEE : FactureEtat::ENCOURS),
             'provider' => 'pennylane',
             'provider_reference' => $this->id,
             'emission_at' => $this->date
