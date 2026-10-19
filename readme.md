@@ -14,7 +14,7 @@
 
 4) Ajouter la commande dans le Kernel.
 
-        $schedule->command('pennylane:send-invoice')->daily();
+        $schedule->command('pennylane:send-invoice')->everyTenMinutes();
 5) Configurer, si besoin, la numérotation des factures dans Pennylane
 
 
