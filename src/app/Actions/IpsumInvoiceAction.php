@@ -58,7 +58,7 @@ class IpsumInvoiceAction
     {
         $this->invoice->finalize($facture->provider_reference);
 
-        if ($facture->numero and $facture->is_payee) {
+        if ($facture->is_payee) {
             $this->invoice->markAsPaid($facture->provider_reference);
         } // Pas de posibilité de marquer une facture comme impayé via l'api
 
