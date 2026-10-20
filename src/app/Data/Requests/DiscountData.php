@@ -18,11 +18,11 @@ class DiscountData extends Data
     }
 
 
-    public static function fromIpsum(float $remise): array
+    public static function fromIpsum(?float $remise): array
     {
         return [
             'type' => 'absolute',
-            'value' => (string) $remise,
+            'value' => (string) ($remise ?? 0),
         ];
     }
 }

@@ -24,9 +24,9 @@ class CreateInvoiceData extends Data
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public Carbon $deadline,
         public int $customer_id,
-        public Optional|DiscountData $discount,
+        //public Optional|DiscountData $discount,
         public string $purchase_order_reference,
-        public ?bool $draft,
+        public bool $draft,
         #[DataCollectionOf(InvoiceLinesData::class)]
         public DataCollection $invoice_lines,
     ) {
@@ -41,7 +41,7 @@ class CreateInvoiceData extends Data
             $dataCollection[] = InvoiceLinesData::fromIpsum($produit)->toArray();
         }
 
-        return self::validateAndCreate(array_filter([
+        return self::validateAndCreate([
             'date' => now(),
             'deadline' => $facture->echeance_at,
             'customer_id' => $facture->client->reference_externe,
@@ -49,7 +49,7 @@ class CreateInvoiceData extends Data
             'purchase_order_reference' => $facture->reservation->reference,
             'draft' => $brouillon,
             'invoice_lines' => $dataCollection
-        ]));
+        ]);
     }
 
     

@@ -53,7 +53,7 @@ class UpdateInvoiceData extends Data
             return !in_array($line['product']['id'], $refs, false);
         })->mapWithKeys(function ($line) { return [['id' => $line['id']]]; })->toArray();
 
-        return self::validateAndCreate(array_filter([
+        return self::validateAndCreate([
             'date' => now(),
             'deadline' => $facture->echeance_at,
             'customer_id' => $facture->client->reference_externe,
@@ -62,7 +62,7 @@ class UpdateInvoiceData extends Data
                 'update' => $dataUpdate,
                 'delete' => $dataDelete
             ]
-        ]));
+        ]);
     }
 
     
