@@ -27,7 +27,7 @@ class IpsumInvoiceAction
         );
     }*/
 
-    public function syncToProvider(Facture $facture, bool $brouillon): InvoiceData
+    public function syncToProvider(Facture $facture): InvoiceData
     {
         if ($facture->provider_reference) {
 
@@ -40,7 +40,7 @@ class IpsumInvoiceAction
             }
 
         } else {
-            $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, $brouillon));
+            $invoice = $this->invoice->create(CreateInvoiceData::fromIpsum($facture, true));
         }
 
         if ($facture->numero and $facture->is_payee) {
@@ -79,7 +79,7 @@ class IpsumInvoiceAction
         }
 
         if (!$facture->client->is_entreprise or $emails) {
-            if ($emails === true) {
+            if ($emails === true or $emails === null) {
                 $emails = [];
             } else {
                 $emails = is_array($emails) ? $emails : [$emails];
