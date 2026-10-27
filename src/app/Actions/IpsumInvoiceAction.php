@@ -108,12 +108,21 @@ class IpsumInvoiceAction
         }
 
         if (!$cache) {
-            return $this->invoice->get($facture->provider_reference)->public_file_url;
+            return $this->_public_file_url($facture);
         }
 
         return Cache::remember('facture-'.$facture->numero, 5 * 60, function () use ($facture) {
-            return $this->invoice->get($facture->provider_reference)->public_file_url;
+            return $this->_public_file_url($facture);
         });
+    }
+
+    protected function _public_file_url(Facture $facture): string
+    {
+        $public_file_url = $this->invoice->get($facture->provider_reference)->public_file_url;
+        if ($public_file_url === null) {
+            throw new PennylaneException('Facture pdf Pennylane pas encore générée.');
+        }
+        return $public_file_url;
     }
 }
 

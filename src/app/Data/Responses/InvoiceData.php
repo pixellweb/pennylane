@@ -25,7 +25,7 @@ class InvoiceData extends Data
         public Carbon $deadline,
         public bool $paid,
         public bool $draft,
-        public string $public_file_url,
+        public ?string $public_file_url,
         public string $purchase_order_reference,
         #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d\TH:i:s.uP')]
         public Carbon $created_at,
