@@ -42,7 +42,7 @@ class CreateInvoiceData extends Data
         }
 
         return self::validateAndCreate([
-            'date' => now(),
+            'date' => $facture->emission_at,
             'deadline' => $facture->echeance_at,
             'customer_id' => $facture->client->reference_externe,
             //'discount' => $facture->remise ? DiscountData::fromIpsum($facture) : null, // Remise au niveau des produits car cela pose problème avec le calcul de la tva

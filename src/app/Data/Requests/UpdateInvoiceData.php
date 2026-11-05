@@ -54,7 +54,7 @@ class UpdateInvoiceData extends Data
         })->mapWithKeys(function ($line) { return [['id' => $line['id']]]; })->toArray();
 
         return self::validateAndCreate([
-            'date' => now(),
+            'date' => $facture->emission_at,
             'deadline' => $facture->echeance_at,
             'customer_id' => $facture->client->reference_externe,
             'invoice_lines' => [

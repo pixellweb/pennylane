@@ -43,8 +43,7 @@ class InvoiceData extends Data
             'numero' => $this->invoice_number !== '' ? $this->invoice_number : null,
             'etat' => $this->draft ? FactureEtat::BROUILLON : ($this->paid ? FactureEtat::PAYEE : FactureEtat::ENCOURS),
             'provider' => 'pennylane',
-            'provider_reference' => $this->id,
-            'emission_at' => $this->date
+            'provider_reference' => $this->id
         ];
         
     }
