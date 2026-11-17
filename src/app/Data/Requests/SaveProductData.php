@@ -28,7 +28,7 @@ class SaveProductData extends Data
             'label' => $prestation->nom,
             'external_reference' => (string) $prestation->id,
             'price_before_tax' => (string) ($prestation->montant / (1 + ($prestation->taxe->taux / 100))),
-            'vat_rate' => $prestation->taxe->taux ? 'FR_'.round($prestation->taxe->taux * 10) : 'exempt',
+            'vat_rate' => (int) $prestation->taxe->taux ? 'FR_'.round($prestation->taxe->taux * 10) : 'exempt',
             'unit' => '',
             'substance' => Substance::SERVICES,
         ]);
