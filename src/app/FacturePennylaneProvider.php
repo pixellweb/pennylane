@@ -47,4 +47,14 @@ class FacturePennylaneProvider implements FactureContract
     {
         return view('Pennylane::iframe');
     }
+
+    public function clientRules(): array
+    {
+        return [
+            "adresse" => "required",
+            "cp" => "required",
+            "ville" => "required",
+            "pays_id" => "required",
+        ];
+    }
 }
